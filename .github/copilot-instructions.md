@@ -1,67 +1,339 @@
-# Copilot instructions — Reading App (MVP)
-
+Copilot Instructions for Reading App (MVP)
 Purpose
-- Give agents an immediate, practical map of this app so generated edits are minimal, correct, and aligned with project constraints.
 
-Big picture
-- Expo + React Native sight-word learning app with a single flow: `HomeScreen` -> `LessonScreen` -> `RewardScreen`.
-- `app/game/WordEngine.js` produces lessons: { word, correctImage, wrongImages } using `app/data/words.json`.
-- `app/audio/AudioPlayer.js` encapsulates Expo AV audio playback; audio files live in `app/assets/sounds`.
-- `app/game/ProgressTracker.js` persists progress via `AsyncStorage`.
+Provide Copilot with a complete map of the project. Ensure all generated code is consistent, minimal, correct, and compatible with Expo + React Native. Agents must follow the folder structure, naming rules, navigation flow, and asset conventions exactly.
 
-Key files to inspect
-- App entry: [App.js](App.js)
-- Screens: [app/screens/HomeScreen.jsx](app/screens/HomeScreen.jsx), [app/screens/LessonScreen.jsx](app/screens/LessonScreen.jsx), [app/screens/RewardScreen.jsx](app/screens/RewardScreen.jsx)
-- Components: [app/components/WordCard.jsx](app/components/WordCard.jsx), [app/components/ImageOption.jsx](app/components/ImageOption.jsx)
-- Logic: [app/game/WordEngine.js](app/game/WordEngine.js), [app/game/ProgressTracker.js](app/game/ProgressTracker.js)
-- Audio: [app/audio/AudioPlayer.js](app/audio/AudioPlayer.js)
-- Data & assets: [app/data/words.json](app/data/words.json), [app/assets](app/assets)
+Big Picture Overview
 
-Project conventions (required)
-- Functional components only; use hooks (`useState`, `useEffect`).
-- Keep UI large, simple, and child-friendly (big fonts, large touch targets).
-- Use relative import paths exactly as the tree shows; do not add or move top-level folders.
-- Persist only to `AsyncStorage`; do not add external backends.
-- Use `AudioPlayer` for all playback; do not call Expo AV directly elsewhere.
-- Random helpers live in `app/utils/random.js` — use `shuffle` / `pickRandom` from there.
+The Reading App is a simple React Native + Expo mobile learning tool for early readers.
 
-Concrete patterns & examples
-- Lesson consumption (LessonScreen):
+Core flow:
+HomeScreen → LessonScreen → RewardScreen
 
-```js
+Lesson generation is handled by WordEngine.js, which produces lesson payloads:
+
+{
+  word: "cat",
+  correctImage: require(...),
+  wrongImages: [require(...), require(...)]
+}
+
+
+Audio playback is handled by AudioPlayer.js using Expo AV.
+Progress is tracked with AsyncStorage inside ProgressTracker.js.
+
+All UI must be child-friendly: large fonts, big tap targets, simple layouts.
+
+Project Structure (Required)
+reading-app
+├── App.js
+├── package.json
+├── README.md
+│
+├── app
+│   ├── screens
+│   │   ├── HomeScreen.jsx
+│   │   ├── LessonScreen.jsx
+│   │   └── RewardScreen.jsx
+│   │
+│   ├── components
+│   │   ├── WordCard.jsx
+│   │   └── ImageOption.jsx
+│   │
+│   ├── game
+│   │   ├── WordEngine.js
+│   │   └── ProgressTracker.js
+│   │
+│   ├── audio
+│   │   └── AudioPlayer.js
+│   │
+│   ├── data
+│   │   └── words.json
+│   │
+│   ├── utils
+│   │   └── random.js
+│   │
+│   ├── styles
+│   │   └── theme.js
+│   │
+│   └── assets
+│       ├── images
+│       └── sounds
+
+
+Agents must not modify this structure unless explicitly told to.
+
+Navigation Rules
+
+Navigation uses React Navigation’s native stack.
+
+App.js must:
+
+Import the screens from app/screens.
+
+Initialize a Stack.Navigator.
+
+Register HomeScreen, LessonScreen, and RewardScreen.
+
+Export the default App component.
+
+Screens
+HomeScreen.jsx
+
+Purpose:
+Display app title/logo and a Start button.
+Start button navigates to LessonScreen.
+
+Requirements:
+
+Large centered button
+
+Simple kid-friendly layout
+
+Navigation: navigation.navigate("Lesson")
+
+LessonScreen.jsx
+
+Purpose:
+Display the word, play audio, show 3 image options (correct + 2 incorrect).
+
+Requirements:
+
+Word displayed via WordCard
+
+Image options displayed via 3 ImageOption components
+
+On correct tap:
+
+visual feedback
+
+update ProgressTracker
+
+navigate to RewardScreen
+
+On incorrect tap: shake or color feedback
+
+Lesson data comes from:
+
 const { word, correctImage, wrongImages } = WordEngine.nextLesson();
-// render: <WordCard word={word} /> and three <ImageOption /> components
-```
 
-- Audio: call `AudioPlayer.play(word)`; audio file should exist at `app/assets/sounds/${word}.mp3` (follow existing filenames).
-- On image tap: `ImageOption` should show immediate visual feedback, call `ProgressTracker` to save result, and—on correct—navigate to `RewardScreen`.
+RewardScreen.jsx
 
-Developer workflow & quick commands
-- Install & run (Expo dev server):
+Purpose:
+Show simple celebration and allow user to continue or return home.
 
-```powershell
+Requirements:
+
+Big “Great job!” icon or animation
+
+Button: Continue → new LessonScreen
+
+Button: Home → HomeScreen
+
+Components
+WordCard.jsx
+
+Requirements:
+
+Displays the current sight word in a large, readable font.
+
+Takes prop: word.
+
+ImageOption.jsx
+
+Requirements:
+
+Tappable image
+
+Props: source, isCorrect, onPress
+
+Must show correct/incorrect feedback (eg. green/red border or overlay)
+
+Game Logic
+WordEngine.js
+
+Requirements:
+
+Source words from app/data/words.json
+
+For each lesson:
+
+pick one word as the correct option
+
+select 2 random incorrect words
+
+map words → asset paths
+
+Return:
+
+{
+  word,
+  correctImage: require("app/assets/images/<word>.png"),
+  wrongImages: [
+    require("app/assets/images/<wrong1>.png"),
+    require("app/assets/images/<wrong2>.png")
+  ]
+}
+
+
+WordEngine must rely only on words.json. No hardcoded word lists.
+
+Progress Tracking
+ProgressTracker.js
+
+Use AsyncStorage.
+Required keys:
+
+@readingApp:progress
+@readingApp:lessonsCompleted
+@readingApp:accuracy
+@readingApp:streak
+
+
+Must expose:
+
+saveProgress(data)
+loadProgress()
+incrementStreak()
+resetStreak()
+
+
+Agents must not rename these keys unless explicitly instructed.
+
+Audio System
+AudioPlayer.js
+
+Must use Expo AV.
+
+Filename rule:
+
+app/assets/sounds/<word>.mp3
+
+
+Function signature:
+
+async function play(word) {
+  const sound = new Audio.Sound();
+  await sound.loadAsync(require(`../assets/sounds/${word}.mp3`));
+  await sound.playAsync();
+}
+
+
+Agents must follow this exact filename pattern.
+
+Assets Conventions (Critical)
+
+Image filenames must match:
+
+app/assets/images/<word>.png
+
+
+Audio filenames must match:
+
+app/assets/sounds/<word>.mp3
+
+
+Examples:
+
+cat.png / cat.mp3
+dog.png / dog.mp3
+sun.png / sun.mp3
+
+
+No uppercase. No special characters. Names must match entries in words.json exactly.
+
+Data Source
+words.json
+
+Single source of truth for available words.
+
+Format:
+
+[
+  "cat",
+  "dog",
+  "sun",
+  "ball",
+  "tree"
+]
+
+
+Agents must not duplicate or hardcode word lists in other files.
+
+Random Helpers
+random.js
+
+Must include:
+
+shuffle(array)
+pickRandom(array, count)
+
+
+These are used by WordEngine to randomize incorrect options.
+
+Theme
+theme.js
+
+Must expose:
+
+colors: { primary, secondary, background, text }
+fonts: { regular, bold }
+spacing: { sm, md, lg }
+
+
+Agents must follow this theme for all UI unless instructed otherwise.
+
+Developer Commands
+
+Install project dependencies:
+
 npm install
 npx expo start
-```
 
-- Validate flow manually: Home → Lesson (choose correct image) → Reward.
 
-Editing rules for agents
-- If a file has a placeholder comment instructing Copilot to implement behavior, replace it with concise, well-commented code that fits project conventions.
-- Limit changes to files relevant to the task; avoid broad refactors.
-- Preserve `AsyncStorage` key names and asset naming conventions; check `app/game/ProgressTracker.js` and `app/data/words.json` before renaming keys or files.
+Install required libraries:
 
-Integration notes / gotchas
-- `words.json` is the single source of truth for words — do not duplicate word lists elsewhere.
-- Asset filenames (images and sounds) must match the word keys used by `WordEngine` and `AudioPlayer`.
-- If unsure about a storage key or asset name, inspect `app/game/ProgressTracker.js` and `app/audio/AudioPlayer.js`.
+npx expo install @react-navigation/native @react-navigation/native-stack
+npx expo install react-native-screens react-native-safe-area-context
+npx expo install expo-av
+npx expo install @react-native-async-storage/async-storage
 
-If you add features
-- Prefer local state + `AsyncStorage`. If adding a dependency, update `package.json` and note why the dependency is necessary.
-- Add a 2–4 line usage example at the top of new modules.
+Editing Rules for Copilot Agents
 
-When in doubt
-- Run the app and test the flow. Ask for clarification when structural changes are proposed.
+Replace placeholder comments with complete, minimal, well-commented code.
 
-Feedback
-- Tell me any missing specifics (exact AsyncStorage keys, asset filename patterns, or desired UX microcopy) and I'll update these instructions.
+Do not create new top-level folders.
+
+Only change files directly related to the requested modification.
+
+Never restructure navigation or folder layout unless told to.
+
+Keep all logic simple and beginner-friendly.
+
+Prefer small functions, readable code, and inline comments.
+
+When unsure, ask for clarification instead of inventing architecture.
+
+Integration Notes / Gotchas
+
+Asset filenames must match word names exactly.
+
+WordEngine and AudioPlayer depend on identical naming.
+
+ProgressTracker key names must remain stable.
+
+Navigation names must match file imports exactly.
+
+All code must work in Expo, not bare React Native.
+
+When In Doubt
+
+Run:
+
+npx expo start
+
+
+Verify the flow:
+Home → Lesson → Reward
+
+If something doesn’t match these instructions, request clarification and include file paths.
