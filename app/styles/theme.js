@@ -1,5 +1,5 @@
 // Shared theme values for the Reading App
-export const colors = {
+const colors = {
   primary: '#4CAF50', // friendly green
   secondary: '#FFC107', // warm accent
   background: '#FFFFFF',
@@ -9,12 +9,12 @@ export const colors = {
   error: '#F44336',
 };
 
-export const fonts = {
+const fonts = {
   regular: 'System',
   bold: 'System',
 };
 
-export const spacing = {
+const spacing = {
   sm: 8,
   md: 16,
   lg: 24,

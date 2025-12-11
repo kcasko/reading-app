@@ -1,4 +1,4 @@
-import words from '../data/words.json';
+import words from '../../data/words.json';
 import { pickRandom, shuffle } from '../utils/random';
 import ProgressTracker from './ProgressTracker';
 
@@ -37,42 +37,45 @@ const WordEngine = {
   async getNextLesson() {
     const pool = Array.isArray(words) ? words.slice() : [];
     if (pool.length === 0) return null;
-
     const progress = await ProgressTracker.getProgress();
     const now = Date.now();
 
-    // find due words: nextDue <= now or not scheduled
+    // pool is array of word objects; meta keyed by word string
+    // find due words: nextReview <= now or not scheduled
     const due = pool.filter((w) => {
-      const meta = (progress.words && progress.words[w]) || null;
+      const meta = (progress.words && progress.words[w.word]) || null;
       return !meta || (meta.nextDue && meta.nextDue <= now);
     });
 
     // choose target: prefer due, else lowest level
-    let target = null;
+    let targetObj = null;
     if (due.length > 0) {
-      target = pickRandom(due, 1)[0];
+      targetObj = pickRandom(due, 1)[0];
     } else {
       // find lowest level words
-      const withMeta = pool.map((w) => ({ w, lvl: (progress.words && progress.words[w] && progress.words[w].level) || 0 }));
+      const withMeta = pool.map((w) => ({ w, lvl: (progress.words && progress.words[w.word] && progress.words[w.word].level) || 0 }));
       withMeta.sort((a, b) => a.lvl - b.lvl);
-      target = withMeta[0].w;
+      targetObj = withMeta[0].w;
     }
 
+    const target = targetObj.word;
+
     // generate distractors using look-alike rules
-    const candidates = pool.filter((w) => w !== target);
+    const candidates = pool.filter((w) => w.word !== target);
     // score candidates by: same length, small edit distance, bigram overlap
     const scored = candidates.map((c) => {
-      const lenScore = c.length === target.length ? 2 : 0;
-      const ed = editDistance(target, c);
+      const cand = c.word;
+      const lenScore = cand.length === target.length ? 2 : 0;
+      const ed = editDistance(target, cand);
       const editScore = ed <= 2 ? (2 - ed) + 1 : 0; // higher for smaller distance
-      const bigramScore = bigramOverlap(target, c);
+      const bigramScore = bigramOverlap(target, cand);
       const score = lenScore * 2 + editScore * 3 + bigramScore;
-      return { c, score };
+      return { c: cand, score };
     });
     scored.sort((a, b) => b.score - a.score);
     let distractors = scored.filter(s => s.score > 0).map(s => s.c).slice(0, 2);
     if (distractors.length < 2) {
-      const remaining = candidates.filter((w) => !distractors.includes(w));
+      const remaining = candidates.map((w) => w.word).filter((w) => !distractors.includes(w));
       const extra = pickRandom(remaining, 2 - distractors.length);
       distractors = distractors.concat(extra);
     }
