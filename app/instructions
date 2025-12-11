@@ -1,0 +1,115 @@
+You are assisting with a mobile children’s reading app built using React Native and Expo. The app teaches sight words with audio, picture choices, rewards, and progress tracking. Follow these rules at all times.
+
+PROJECT STRUCTURE:
+
+reading-app
+├── App.js
+├── package.json
+├── README.md
+│
+├── app
+│   ├── assets
+│   │   ├── images
+│   │   └── sounds
+│   │
+│   ├── audio
+│   │   └── AudioPlayer.js
+│   │
+│   ├── data
+│   │   └── words.json
+│   │
+│   ├── screens
+│   │   ├── HomeScreen.jsx
+│   │   ├── LessonScreen.jsx
+│   │   └── RewardScreen.jsx
+│   │
+│   ├── components
+│   │   ├── ImageOption.jsx
+│   │   └── WordCard.jsx
+│   │
+│   ├── styles
+│   │   └── theme.js
+│   │
+│   ├── utils
+│   │   └── random.js
+│   │
+│   └── game
+│       ├── ProgressTracker.js
+│       └── WordEngine.js
+
+
+PRIMARY GOALS:
+
+Build a simple, stable MVP for a children’s reading learning app.
+
+Generate React Native components that follow clean structure and match file responsibilities.
+
+Write readable, well-commented, error-free code.
+
+Keep everything simple, kid friendly, and minimal for MVP.
+
+Use Expo and React Navigation conventions.
+
+Use only local state or AsyncStorage unless explicitly told otherwise.
+
+SCREEN REQUIREMENTS:
+HomeScreen.jsx
+Show logo or app title and a Start button. Navigate to LessonScreen.
+
+LessonScreen.jsx
+Display the selected word from WordEngine.
+Show 3 tappable image options.
+Play audio using AudioPlayer.
+On correct choice, navigate to RewardScreen.
+
+RewardScreen.jsx
+Show a simple reward animation or graphic.
+Button to return Home or continue.
+
+COMPONENT REQUIREMENTS:
+WordCard.jsx
+Show a large readable word.
+
+ImageOption.jsx
+Show a tappable image.
+Provide correct and incorrect feedback states.
+
+LOGIC MODULES:
+WordEngine.js
+Generate lesson data.
+Return { word, correctImage, wrongImages }.
+Use words.json and simple randomization.
+
+ProgressTracker.js
+Save and load streaks, accuracy, completed lessons using AsyncStorage.
+
+AudioPlayer.js
+Play a sound file based on a given word using Expo AV.
+
+UTILITIES:
+random.js
+Provide shuffle and random-pick helpers.
+
+STYLING:
+theme.js
+Define primary colors, fonts, spacing.
+
+NAVIGATION:
+App.js
+Use React Navigation Stack with HomeScreen, LessonScreen, RewardScreen.
+
+CODE STYLE RULES:
+Write functional components only.
+Use hooks like useState and useEffect when needed.
+Keep children’s UI large, clean, simple.
+Avoid complex animations unless asked.
+Import paths must follow the folder structure exactly.
+Prefer inline comments explaining logic.
+Keep all code beginner readable.
+
+BEHAVIOR RULES:
+If a file already contains placeholder comments, generate the full code according to those instructions.
+Do not create new folders unless explicitly instructed.
+Follow the established project tree exactly.
+Respect Expo environment requirements.
+Use relative imports and correct paths.
