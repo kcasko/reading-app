@@ -1,30 +1,36 @@
 Copilot Instructions for Reading App (MVP)
 Purpose
 
-Provide Copilot with a complete map of the project. Ensure all generated code is consistent, minimal, correct, and compatible with Expo + React Native. Agents must follow the folder structure, naming rules, navigation flow, and asset conventions exactly.
+Provide Copilot with a clear, authoritative map of the project.
+All generated code must remain consistent with the project structure, naming rules, navigation flow, asset conventions, and Expo + React Native environment.
 
-Big Picture Overview
+These instructions override Copilot’s default behavior.
+Agents must not guess or redesign architecture.
 
-The Reading App is a simple React Native + Expo mobile learning tool for early readers.
+1. Big Picture Overview
 
-Core flow:
+The Reading App is an early-reader learning tool built with React Native + Expo.
+
+Core navigation flow:
 HomeScreen → LessonScreen → RewardScreen
 
-Lesson generation is handled by WordEngine.js, which produces lesson payloads:
+Logic responsibilities:
 
-{
-  word: "cat",
-  correctImage: require(...),
-  wrongImages: [require(...), require(...)]
-}
+WordEngine.js generates lesson payloads:
+{ word, correctImage, wrongImages }
 
+AudioPlayer.js plays audio via Expo AV.
 
-Audio playback is handled by AudioPlayer.js using Expo AV.
-Progress is tracked with AsyncStorage inside ProgressTracker.js.
+ProgressTracker.js stores progress in AsyncStorage.
 
-All UI must be child-friendly: large fonts, big tap targets, simple layouts.
+UI must be child-friendly: large text, big tap targets, simple layouts.
 
-Project Structure (Required)
+No external backend. No advanced animations unless requested.
+
+2. Required Project Structure
+
+Agents must follow this exact tree:
+
 reading-app
 ├── App.js
 ├── package.json
@@ -61,128 +67,126 @@ reading-app
 │       └── sounds
 
 
-Agents must not modify this structure unless explicitly told to.
+Do not alter this hierarchy unless explicitly instructed.
 
-Navigation Rules
+3. Navigation Rules (App.js)
 
-Navigation uses React Navigation’s native stack.
+Use React Navigation Native Stack.
 
 App.js must:
 
-Import the screens from app/screens.
+Import screens from app/screens
 
-Initialize a Stack.Navigator.
+Create a NavigationContainer
 
-Register HomeScreen, LessonScreen, and RewardScreen.
+Register:
 
-Export the default App component.
+"Home" → HomeScreen
 
-Screens
+"Lesson" → LessonScreen
+
+"Reward" → RewardScreen
+
+Export the App component
+
+Screen names must remain consistent.
+
+4. Screen Requirements
 HomeScreen.jsx
 
-Purpose:
-Display app title/logo and a Start button.
-Start button navigates to LessonScreen.
+Purpose: Entry point of the app.
 
 Requirements:
 
-Large centered button
+Large centered “Start” button
 
-Simple kid-friendly layout
+Simple child-friendly layout
 
-Navigation: navigation.navigate("Lesson")
+On press: navigation.navigate("Lesson")
 
 LessonScreen.jsx
 
-Purpose:
-Display the word, play audio, show 3 image options (correct + 2 incorrect).
+Purpose: Present a single lesson.
 
 Requirements:
 
-Word displayed via WordCard
+Retrieve lesson via:
+const { word, correctImage, wrongImages } = WordEngine.nextLesson()
 
-Image options displayed via 3 ImageOption components
+Show WordCard for the word
 
-On correct tap:
+Show 3 ImageOption components
+(1 correct, 2 wrong)
 
-visual feedback
+Must:
 
-update ProgressTracker
+Show feedback on taps
 
-navigate to RewardScreen
+Play audio for the word
 
-On incorrect tap: shake or color feedback
-
-Lesson data comes from:
-
-const { word, correctImage, wrongImages } = WordEngine.nextLesson();
+On correct: update ProgressTracker → navigate to RewardScreen
 
 RewardScreen.jsx
 
-Purpose:
-Show simple celebration and allow user to continue or return home.
+Purpose: Positive feedback + next step.
 
 Requirements:
 
-Big “Great job!” icon or animation
+Simple celebration UI
 
-Button: Continue → new LessonScreen
+“Continue” → new lesson
 
-Button: Home → HomeScreen
+“Home” → HomeScreen
 
-Components
+5. Components
 WordCard.jsx
 
-Requirements:
+Displays the word using large, readable text.
 
-Displays the current sight word in a large, readable font.
-
-Takes prop: word.
+Accepts word prop.
 
 ImageOption.jsx
 
-Requirements:
+Tappable image button.
 
-Tappable image
+Props:
+source, isCorrect, onPress
 
-Props: source, isCorrect, onPress
+Must visually show correct/incorrect feedback.
 
-Must show correct/incorrect feedback (eg. green/red border or overlay)
-
-Game Logic
+6. Game Logic
 WordEngine.js
 
-Requirements:
+Rules:
 
-Source words from app/data/words.json
+Use words.json as the only word source.
 
 For each lesson:
 
-pick one word as the correct option
+Select a correct word
 
-select 2 random incorrect words
+Select 2 incorrect random words
 
-map words → asset paths
+Map each word to image assets
 
-Return:
+Returned object:
 
 {
   word,
   correctImage: require("app/assets/images/<word>.png"),
   wrongImages: [
-    require("app/assets/images/<wrong1>.png"),
-    require("app/assets/images/<wrong2>.png")
+    require("app/assets/images/<other1>.png"),
+    require("app/assets/images/<other2>.png")
   ]
 }
 
 
-WordEngine must rely only on words.json. No hardcoded word lists.
+Hardcoded word lists are not allowed.
 
-Progress Tracking
+7. Progress Tracking
 ProgressTracker.js
 
-Use AsyncStorage.
-Required keys:
+Use AsyncStorage with these fixed keys:
 
 @readingApp:progress
 @readingApp:lessonsCompleted
@@ -190,7 +194,7 @@ Required keys:
 @readingApp:streak
 
 
-Must expose:
+Expose functions:
 
 saveProgress(data)
 loadProgress()
@@ -198,19 +202,19 @@ incrementStreak()
 resetStreak()
 
 
-Agents must not rename these keys unless explicitly instructed.
+Do not rename keys unless requested.
 
-Audio System
+8. Audio System
 AudioPlayer.js
 
 Must use Expo AV.
 
-Filename rule:
+Audio file naming:
 
 app/assets/sounds/<word>.mp3
 
 
-Function signature:
+Implementation pattern:
 
 async function play(word) {
   const sound = new Audio.Sound();
@@ -219,16 +223,16 @@ async function play(word) {
 }
 
 
-Agents must follow this exact filename pattern.
+Agents must follow this pattern exactly.
 
-Assets Conventions (Critical)
+9. Asset Conventions (Critical)
 
-Image filenames must match:
+Images must follow:
 
 app/assets/images/<word>.png
 
 
-Audio filenames must match:
+Audio must follow:
 
 app/assets/sounds/<word>.mp3
 
@@ -240,12 +244,17 @@ dog.png / dog.mp3
 sun.png / sun.mp3
 
 
-No uppercase. No special characters. Names must match entries in words.json exactly.
+Names must match words.json entries exactly:
 
-Data Source
-words.json
+lowercase
 
-Single source of truth for available words.
+no spaces
+
+no special characters
+
+10. Data Source (words.json)
+
+words.json is the single source of truth.
 
 Format:
 
@@ -258,9 +267,9 @@ Format:
 ]
 
 
-Agents must not duplicate or hardcode word lists in other files.
+Do not redefine the word list in any other file.
 
-Random Helpers
+11. Helpers
 random.js
 
 Must include:
@@ -269,23 +278,22 @@ shuffle(array)
 pickRandom(array, count)
 
 
-These are used by WordEngine to randomize incorrect options.
+Used exclusively by WordEngine.
 
-Theme
-theme.js
+12. Theme (theme.js)
 
-Must expose:
+Must export:
 
 colors: { primary, secondary, background, text }
-fonts: { regular, bold }
+fonts:  { regular, bold }
 spacing: { sm, md, lg }
 
 
-Agents must follow this theme for all UI unless instructed otherwise.
+All UI should use the shared theme.
 
-Developer Commands
+13. Developer Commands
 
-Install project dependencies:
+Install dependencies:
 
 npm install
 npx expo start
@@ -298,42 +306,49 @@ npx expo install react-native-screens react-native-safe-area-context
 npx expo install expo-av
 npx expo install @react-native-async-storage/async-storage
 
-Editing Rules for Copilot Agents
 
-Replace placeholder comments with complete, minimal, well-commented code.
+Run app:
 
-Do not create new top-level folders.
+npx expo start
 
-Only change files directly related to the requested modification.
+14. Editing Rules for Copilot Agents
 
-Never restructure navigation or folder layout unless told to.
+Agents must follow these rules:
 
-Keep all logic simple and beginner-friendly.
+Replace placeholder comments with minimal, well-commented code.
 
-Prefer small functions, readable code, and inline comments.
+Never alter top-level folders.
 
-When unsure, ask for clarification instead of inventing architecture.
+Change only files relevant to the current request.
 
-Integration Notes / Gotchas
+Avoid architectural changes unless explicitly requested.
+
+Keep logic simple and beginner-friendly.
+
+Prefer small, readable functions.
+
+Ask for clarification when behavior is unclear.
+
+15. Integration Notes / Gotchas
 
 Asset filenames must match word names exactly.
 
 WordEngine and AudioPlayer depend on identical naming.
 
-ProgressTracker key names must remain stable.
+ProgressTracker key names must not change.
 
-Navigation names must match file imports exactly.
+React Navigation screen names must match App.js.
 
-All code must work in Expo, not bare React Native.
+All code must run under Expo (not bare RN).
 
-When In Doubt
+16. When In Doubt
 
 Run:
 
 npx expo start
 
 
-Verify the flow:
+Verify:
 Home → Lesson → Reward
 
-If something doesn’t match these instructions, request clarification and include file paths.
+If something appears inconsistent with these instructions, ask for clarification and include the relevant file path.
