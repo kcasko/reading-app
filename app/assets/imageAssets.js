@@ -1,5 +1,5 @@
 // Static image asset map to avoid dynamic requires (Metro bundler safe)
-const images = {
+export const imageAssets = {
   cat: require('./images/cat.png'),
   dog: require('./images/dog.png'),
   sun: require('./images/sun.png'),
@@ -7,4 +7,5 @@ const images = {
   tree: require('./images/tree.png'),
 };
 
-export default images;
+// default export for backward compatibility
+export default imageAssets;
