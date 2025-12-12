@@ -1,0 +1,102 @@
+[
+  {
+    "word": "i",
+    "graphemes": ["i"],
+    "phonemes": ["iy"],
+    "tricky": [],
+    "similarWords": ["a", "hi"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "a",
+    "graphemes": ["a"],
+    "phonemes": ["ə"],
+    "tricky": ["a"],
+    "similarWords": ["i", "an"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "the",
+    "graphemes": ["th", "e"],
+    "phonemes": ["ð", "ə"],
+    "tricky": ["e"],
+    "similarWords": ["then", "they"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "is",
+    "graphemes": ["i", "s"],
+    "phonemes": ["ɪ", "s"],
+    "tricky": [],
+    "similarWords": ["it", "in"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "it",
+    "graphemes": ["i", "t"],
+    "phonemes": ["ɪ", "t"],
+    "tricky": [],
+    "similarWords": ["is", "at"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "can",
+    "graphemes": ["c", "a", "n"],
+    "phonemes": ["k", "æ", "n"],
+    "tricky": [],
+    "similarWords": ["cap", "cot"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "see",
+    "graphemes": ["s", "ee"],
+    "phonemes": ["s", "iy"],
+    "tricky": ["ee"],
+    "similarWords": ["sea", "seed"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "like",
+    "graphemes": ["l", "i", "ke"],
+    "phonemes": ["l", "ay", "k"],
+    "tricky": ["i", "ke"],
+    "similarWords": ["bike", "live"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "go",
+    "graphemes": ["g", "o"],
+    "phonemes": ["g", "oʊ"],
+    "tricky": ["o"],
+    "similarWords": ["got", "so"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  },
+  {
+    "word": "said",
+    "graphemes": ["s", "ai", "d"],
+    "phonemes": ["s", "ɛ", "d"],
+    "tricky": ["ai"],
+    "similarWords": ["sad", "paid", "sid"],
+    "srsLevel": 1,
+    "lastReviewed": null,
+    "nextReview": null
+  }
+]
