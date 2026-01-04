@@ -22,7 +22,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#F5F0E8"
       },
-      "package": "com.sightwords.readingapp"
+      "package": "com.sightwords.readingapp",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "plugins": [
       "expo-av",
@@ -31,7 +35,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "ecf410d7-b8d9-4f83-8ab2-c7e0e96fa0be"
       }
     }
   }

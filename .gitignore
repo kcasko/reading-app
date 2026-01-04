@@ -25,3 +25,24 @@ coverage/
 .vscode/
 *.swp
 *.swo
+
+# Environment
+.env
+.env.local
+.env.production
+.env.staging
+
+# Build artifacts
+*.apk
+*.aab
+*.ipa
+build/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Backups
+*.backup
+backups/

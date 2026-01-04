@@ -1,5 +1,7 @@
 # Migration Guide - Switch to New Implementation
 
+> **Quick Links:** [README](README.md) | [Summary](SUMMARY.md) | [Implementation](IMPLEMENTATION.md) | [Features](FEATURES.md)
+
 This guide will help you activate the new exposure-based learning system.
 
 ## Step 1: Backup Current Files

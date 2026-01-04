@@ -1,5 +1,7 @@
 # Children's Reading App - Complete Implementation Summary
 
+> **Quick Links:** [README](README.md) | [Features](FEATURES.md) | [Implementation](IMPLEMENTATION.md) | [API Docs](API.md) | [Contributing](CONTRIBUTING.md)
+
 ## 🎯 Project Overview
 
 A children's reading app that teaches sight reading using concrete nouns paired with simple images. Designed for 4-year-olds who cannot read instructions.

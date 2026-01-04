@@ -1,5 +1,7 @@
 # Audio Files Setup
 
+> **Quick Links:** [README](README.md) | [Features](FEATURES.md) | [Fonts Setup](FONTS.md)
+
 The reading app supports optional audio files for enhanced learning experience. Audio features work without these files (they'll fall back to console messages), but adding them provides better user experience.
 
 ## Required Audio Files

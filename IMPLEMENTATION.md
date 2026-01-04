@@ -1,5 +1,7 @@
 # Children's Reading App - Implementation Guide
 
+> **Quick Links:** [README](README.md) | [Summary](SUMMARY.md) | [Features](FEATURES.md) | [API Docs](API.md) | [Migration](MIGRATION.md)
+
 ## Core Principles (NEVER VIOLATE)
 
 ✓ **Word is always larger than the image**  

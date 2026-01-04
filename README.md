@@ -9,6 +9,19 @@
 
 A production-ready React Native + Expo app for teaching young children sight words through audio-first interaction and spaced repetition.
 
+## Table of Contents
+
+- [Design Principles](#design-principles)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [Architecture](#architecture)
+- [Development](#development)
+- [Deployment](#deployment)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Design Principles
 
 - **Calm, focused UX** for young children
@@ -16,6 +29,32 @@ A production-ready React Native + Expo app for teaching young children sight wor
 - **No ads, dark patterns, or overstimulation**
 - **Large tap targets** and high contrast visuals
 - **Audio-first learning** with adjustable playback speed
+
+## Features
+
+### Core Learning Features
+- ✅ **32 Words** across 4 categories (animals, food, objects, vehicles)
+- ✅ **Exposure-based learning** - no right/wrong, just gentle repetition
+- ✅ **Spaced repetition algorithm** - intelligent word selection
+- ✅ **Tap-to-hear** - tap anywhere on screen to hear word spoken
+- ✅ **Auto-advance** - automatic progression after audio plays
+- ✅ **Image fade algorithm** - images gradually disappear as mastery increases
+
+### User Features
+- ✅ **Multiple child profiles** - complete data isolation per child
+- ✅ **Category selection** - choose from 4 word categories
+- ✅ **Session customization** - 10-30 words per lesson
+- ✅ **Voice selection** - 4 voice types (Default, Male, Female, Child)
+- ✅ **Custom fonts** - System, OpenDyslexic, Comic Sans MS for accessibility
+- ✅ **Review mode** - zero-pressure practice of learned words
+- ✅ **Mastery celebrations** - gentle encouragement at 25 exposures
+- ✅ **Daily streaks** - non-pressuring consistency tracking
+- ✅ **Sound effects** - optional success sounds and background music
+- ✅ **Progress tracking** - detailed parent dashboard
+- ✅ **Backup & restore** - export/import all child data
+- ✅ **Image preloading** - smooth, instant transitions
+
+See [FEATURES.md](FEATURES.md) for complete feature documentation.
 
 ## Getting Started
 
@@ -29,6 +68,10 @@ A production-ready React Native + Expo app for teaching young children sight wor
 ### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/kcasko/reading-app.git
+cd reading-app
+
 # Install dependencies
 npm install
 
@@ -41,6 +84,49 @@ npm run ios
 # Run on Android
 npm run android
 ```
+
+### Initial Setup
+
+1. **Audio Setup** (Optional but recommended)
+   ```bash
+   npm run audio-setup
+   ```
+   See [AUDIO.md](AUDIO.md) for adding success sounds and background music.
+
+2. **Font Setup** (Optional)
+   
+   See [FONTS.md](FONTS.md) for adding OpenDyslexic fonts for dyslexic readers.
+
+3. **Test the App**
+   - Create a child profile
+   - Select word categories
+   - Start a lesson and tap to hear words
+
+### Troubleshooting
+
+**App won't start:**
+```bash
+# Clear cache and restart
+npm start -- --clear
+```
+
+**Audio not working:**
+- Ensure device volume is up
+- Check that device is not in silent mode
+- Test with headphones to rule out speaker issues
+
+**Images not loading:**
+- Check that image files exist in `assets/images/`
+- Verify paths in `src/data/wordLists.ts` match actual files
+- Run `npm start -- --clear` to clear asset cache
+
+**TypeScript errors:**
+```bash
+# Check for type errors
+npx tsc --noEmit
+```
+
+For more help, see [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
 ## Project Structure
 
@@ -193,19 +279,19 @@ export const MY_WORDS: Word[] = [
 
 ### Before Production
 
-1. **Add audio files**: Record or source audio for all words
+1. **Add audio files**: See [AUDIO.md](AUDIO.md) for adding success sounds and background music
 2. **Add app icons**: Create icon.png (1024x1024), splash.png, adaptive-icon.png
-3. **Test on devices**: Verify touch targets and audio on real hardware
-4. **Accessibility audit**: Ensure VoiceOver/TalkBack compatibility
+3. **Add word images**: Add images to `assets/images/` or keep using emoji placeholders
+4. **Test on devices**: Verify touch targets and audio on real hardware
+5. **Accessibility audit**: Ensure VoiceOver/TalkBack compatibility
 
-### Future Enhancements
+### Deployment
 
-- [ ] Add more word levels (primer, first grade, etc.)
-- [ ] Custom fonts via expo-font
-- [ ] Parent dashboard with detailed analytics
-- [ ] Multiple user profiles
-- [ ] Word illustrations (optional visual cues)
-- [ ] Achievement system (subtle, not gamified)
+See [DEPLOYMENT.md](DEPLOYMENT.md) for:
+- Building production apps with EAS Build
+- Submitting to App Store and Google Play
+- OTA updates with Expo Updates
+- Environment configuration
 
 ### Technical Improvements
 
@@ -213,34 +299,94 @@ export const MY_WORDS: Word[] = [
 - [ ] E2E tests with Detox
 - [ ] Error boundary for crash recovery
 - [ ] Analytics integration (privacy-focused)
-- [ ] OTA updates via Expo Updates
+- [ ] Performance monitoring
 
-## Configuration
+## Development
 
-Key constants in `src/utils/constants.ts`:
+### Running Linter
 
-```typescript
-LESSON_CONFIG = {
-  WORDS_PER_LESSON: 5,      // Words per session
-  MIN_ATTEMPTS_FOR_MASTERY: 3,
-  MASTERY_THRESHOLD: 0.8,    // 80% accuracy required
-}
+```bash
+# Check for issues
+npm run lint
 
-AUDIO_CONFIG = {
-  DEFAULT_RATE: 1.0,
-  SLOW_RATE: 0.75,
-  AUTO_PLAY_DELAY: 300,      // ms before auto-play
-}
+# Auto-fix issues
+npm run lint:fix
 ```
 
-## License
+### Code Structure Guidelines
 
-MIT
+- Keep `src/engine/` free of React dependencies
+- Use functional components with hooks only
+- Maintain type safety - no `any` types
+- Follow existing code style and patterns
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines
+
+### Adding Words
+
+Edit [src/data/wordLists.ts](src/data/wordLists.ts):
+
+```typescript
+export const ANIMAL_WORDS: Word[] = [
+  {
+    id: 'cat',
+    text: 'cat',
+    imagePath: require('../../assets/images/animals/cat.png'),
+    category: 'animals',
+    level: 1,
+  },
+  // Add more words...
+];
+```
+
+### Customizing Settings
+
+Key constants in [src/utils/constants.ts](src/utils/constants.ts):
+
+```typescript
+export const LESSON_CONFIG = {
+  MIN_WORDS_PER_LESSON: 10,
+  MAX_WORDS_PER_LESSON: 30,
+  DEFAULT_WORDS_PER_LESSON: 20,
+};
+
+export const MASTERY_THRESHOLD = 25; // Exposures needed for mastery
+```
+
+## Deployment
+
+For production deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+Quick overview:
+1. Configure app.json with your app details
+2. Build with EAS Build
+3. Submit to app stores
+4. Enable OTA updates
+
+## Documentation
+
+**[📚 Complete Documentation Index](DOCS.md)** - Navigate all documentation
+
+### Core Documentation
+- **[README.md](README.md)** - This file, overview and quick start
+- **[SUMMARY.md](SUMMARY.md)** - Complete project overview and philosophy
+- **[FEATURES.md](FEATURES.md)** - Detailed feature documentation
+- **[IMPLEMENTATION.md](IMPLEMENTATION.md)** - Implementation guide and checklist
+- **[MIGRATION.md](MIGRATION.md)** - Guide for switching to new implementation
+- **[API.md](API.md)** - Code architecture and API documentation
+
+### Setup Guides
+- **[AUDIO.md](AUDIO.md)** - Audio file setup and requirements
+- **[FONTS.md](FONTS.md)** - Custom font installation guide
+
+### Contributing & Deployment
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide
 
 ## Contributing
 
-This is a foundation for a real product. Focus on:
-
-- Maintaining code clarity
-- Keeping the engine layer pure
-- Respecting the calm, child-focused UX
+We welcome contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Code of conduct
+- Development setup
+- Code standards
+- Pull request process
+- Priority areas for contribution

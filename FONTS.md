@@ -1,5 +1,7 @@
 # Custom Fonts Setup for Reading App
 
+> **Quick Links:** [README](README.md) | [Features](FEATURES.md) | [Audio Setup](AUDIO.md)
+
 ## Overview
 This app now supports custom fonts optimized for readability, especially for children with dyslexia or reading difficulties.
 
