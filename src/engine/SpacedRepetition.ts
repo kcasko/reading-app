@@ -162,45 +162,6 @@ export function calculatePriority(progress: WordProgress, now: number = Date.now
 }
 
 /**
- * Get image opacity based on exposure count.
- * Returns a value between 0 (invisible) and 1 (fully visible).
- */
-export function getImageOpacity(exposureCount: number): number {
-  if (exposureCount < IMAGE_FADE_THRESHOLDS.START_FADE) {
-    // Full opacity for new words
-    return 1.0;
-  } else if (exposureCount < IMAGE_FADE_THRESHOLDS.INTERMITTENT) {
-    // Gradual fade from 1.0 to 0.3
-    const progress = (exposureCount - IMAGE_FADE_THRESHOLDS.START_FADE) / 
-                    (IMAGE_FADE_THRESHOLDS.INTERMITTENT - IMAGE_FADE_THRESHOLDS.START_FADE);
-    return 1.0 - (progress * 0.7);
-  } else if (exposureCount < IMAGE_FADE_THRESHOLDS.HIDE) {
-    // Show intermittently at 30% opacity
-    return 0.3;
-  } else {
-    // Hide completely
-    return 0;
-  }
-}
-
-/**
- * Check if image should be shown at all (for intermittent phase).
- * Returns true if image should be visible this time.
- */
-export function shouldShowImage(exposureCount: number): boolean {
-  if (exposureCount < IMAGE_FADE_THRESHOLDS.INTERMITTENT) {
-    // Always show during fade phase
-    return true;
-  } else if (exposureCount < IMAGE_FADE_THRESHOLDS.HIDE) {
-    // Show 50% of the time during intermittent phase
-    return Math.random() < 0.5;
-  } else {
-    // Never show when fully mastered
-    return false;
-  }
-}
-
-/**
  * Calculate audio dependency ratio.
  */
 export function getAudioDependencyRatio(progress: WordProgress): number {
