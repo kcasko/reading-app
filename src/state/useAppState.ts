@@ -17,6 +17,7 @@ import {
   markAudioPlayed,
   getMasteryStats,
   getNextWord,
+  introduceWord,
   introduceWords,
   getUnintroducedWordIdsByCategory,
   getWordProgress,
@@ -240,6 +241,13 @@ export function useAppState(): AppState & AppActions {
     
     // Get first word from selected categories
     const word = getNextWord(state, [], selectedCategories);
+    
+    // If word is not yet introduced, introduce it now
+    if (word && !state.introducedWordIds.includes(word.id)) {
+      state = introduceWord(state, word.id);
+      setEngineState(state);
+    }
+    
     setCurrentWord(word);
     setWordsInSession(0);
     setCurrentSessionWords([]); // Start fresh session tracking
@@ -342,11 +350,13 @@ export function useAppState(): AppState & AppActions {
    * Advance to next word in session.
    */
   const advanceToNextWord = useCallback(() => {
+    console.log('advanceToNextWord called, current count:', wordsInSession);
     const newCount = wordsInSession + 1;
     setWordsInSession(newCount);
     
     // Use session length from settings
     if (newCount >= settings.sessionLength) {
+      console.log('Session complete!');
       // Session complete - save words for replay
       setLastSessionWords(currentSessionWords);
       setCurrentWord(null); // End session
@@ -356,7 +366,16 @@ export function useAppState(): AppState & AppActions {
       return;
     }
     
-    const nextWord = getNextWord(engineState, [], selectedCategories);
+    console.log('Getting next word...');
+    let nextWord = getNextWord(engineState, [], selectedCategories);
+    console.log('Next word:', nextWord?.text);
+    
+    // If word is not yet introduced, introduce it now
+    if (nextWord && !engineState.introducedWordIds.includes(nextWord.id)) {
+      const newState = introduceWord(engineState, nextWord.id);
+      setEngineState(newState);
+    }
+    
     setCurrentWord(nextWord);
     
     // Preload next 5 word images for smooth transitions

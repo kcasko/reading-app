@@ -10,7 +10,7 @@
  * - Image fades over time based on exposures
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -59,6 +59,7 @@ export function LessonScreen({
 }: LessonScreenComponentProps) {
   const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
   const [isFirstAppearance, setIsFirstAppearance] = useState(true);
+  const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Navigate to mastery screen when word is mastered
   useEffect(() => {
@@ -74,44 +75,62 @@ export function LessonScreen({
   // Mark word as exposed when it appears
   useEffect(() => {
     if (currentWord) {
+      console.log('New word appeared:', currentWord.id);
       setHasPlayedAudio(false);
       setIsFirstAppearance(true);
       onWordExposed();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentWord?.id, onWordExposed]);
+  }, [currentWord?.id]);
   
   // Auto-advance after audio plays (gentle delay)
   useEffect(() => {
+    console.log('Auto-advance check:', { hasPlayedAudio, isFirstAppearance });
+    
+    // Clear any existing timer
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    
     if (hasPlayedAudio && !isFirstAppearance) {
-      const timer = setTimeout(() => {
+      console.log('Setting timer to advance in 2 seconds...');
+      autoAdvanceTimerRef.current = setTimeout(() => {
+        console.log('Auto-advancing to next word');
         onAdvance();
       }, 2000); // 2 second pause after audio before advancing
-      
-      return () => clearTimeout(timer);
     }
-  }, [hasPlayedAudio, isFirstAppearance, onAdvance]);
+    
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+    };
+  }, [hasPlayedAudio, isFirstAppearance]); // Removed onAdvance from dependencies
   
   const handleScreenTap = useCallback(async () => {
     if (!currentWord) return;
     
+    console.log('Screen tapped - speaking word:', currentWord.text);
+    console.log('Before tap - hasPlayedAudio:', hasPlayedAudio, 'isFirstAppearance:', isFirstAppearance);
+    
     // Play audio with voice settings
     try {
       await speakWord(currentWord.text, {
-        rate: settings.audioRate,
-        voice: settings.voiceType,
+        rate: settings?.audioRate ?? 0.75,
+        voice: settings?.voiceType ?? 'default',
       });
+      
+      console.log('Audio finished playing, updating state...');
       onAudioPlayed();
       setHasPlayedAudio(true);
+      setIsFirstAppearance(false);
       
-      // After first tap, mark that child has interacted
-      if (isFirstAppearance) {
-        setIsFirstAppearance(false);
-      }
+      console.log('State updated - hasPlayedAudio: true, isFirstAppearance: false');
     } catch (error) {
       console.error('Failed to speak word:', error);
     }
-  }, [currentWord, isFirstAppearance, onAudioPlayed, settings.audioRate, settings.voiceType]);
+  }, [currentWord, hasPlayedAudio, isFirstAppearance, onAudioPlayed, settings]);
   
   // No word available - session ended
   if (!currentWord) {

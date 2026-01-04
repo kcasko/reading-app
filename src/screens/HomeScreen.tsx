@@ -15,6 +15,7 @@ import {
   Pressable,
   StyleSheet,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
@@ -116,7 +117,11 @@ export function HomeScreen({
   
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Profile Badge - shows active profile */}
         {activeProfile && (
           <View style={styles.profileBadge}>
@@ -254,7 +259,7 @@ export function HomeScreen({
             </Pressable>
           </View>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -264,11 +269,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  content: {
     paddingHorizontal: spacing.screenHorizontal,
     paddingVertical: spacing.screenVertical,
-    justifyContent: 'space-between',
+    paddingBottom: spacing.xl * 2,
   },
   profileBadge: {
     position: 'absolute',
@@ -307,7 +314,8 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   categoryContainer: {
-    marginVertical: spacing.xl,
+    marginVertical: spacing.lg,
+    zIndex: 10,
   },
   categoryPrompt: {
     ...typography.body,
@@ -362,9 +370,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   mainButtonContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
   },
   startButton: {
     width: 280,

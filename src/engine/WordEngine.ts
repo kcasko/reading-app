@@ -152,6 +152,20 @@ export function getNextWord(
     });
   }
   
+  // If no words available in selected categories, introduce a new one
+  if (progressList.length === 0 && selectedCategories && selectedCategories.length > 0) {
+    // Find words from selected categories that haven't been introduced yet
+    const availableWords = ALL_WORDS.filter(word => 
+      selectedCategories.includes(word.category) &&
+      !state.introducedWordIds.includes(word.id)
+    );
+    
+    if (availableWords.length > 0) {
+      // Return the first available word (it will be introduced when exposed)
+      return availableWords[0];
+    }
+  }
+  
   if (progressList.length === 0) {
     return null;
   }
