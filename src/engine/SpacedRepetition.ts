@@ -82,9 +82,6 @@ export const MASTERY_CRITERIA = {
   REQUIRED_NO_IMAGE_SUCCESSES: 3,
   
   /** Audio ratio threshold to downgrade from mastered */
-    noImageSuccessCount: 0,
-    lastNoImageSuccessAt: 0,
-    masteryState: MasteryState.LEARNING,
   DOWNGRADE_AUDIO_RATIO: 0.35,
 };
 
@@ -99,9 +96,15 @@ export function createWordProgress(wordId: string): WordProgress {
     audioPlayCount: 0,
     lastSeenAt: now,
     introducedAt: now,
+    noImageSuccessCount: 0,
+    lastNoImageSuccessAt: 0,
+    masteryState: MasteryState.LEARNING,
   };
 }
- Also updates mastery state based on exposure thresholds.
+
+/**
+ * Record that the word was exposed (shown on screen).
+ * Also updates mastery state based on exposure thresholds.
  */
 export function recordExposure(progress: WordProgress): WordProgress {
   const updated = {
@@ -110,9 +113,12 @@ export function recordExposure(progress: WordProgress): WordProgress {
     lastSeenAt: Date.now(),
   };
   
-  return updateMasteryState(updated) ...progress,
-    exposureCount: progress.exposureCount + 1,
-   May trigger mastery downgrade if dependency ratio increases.
+  return updateMasteryState(updated);
+}
+
+/**
+ * Record that audio was played for this word.
+ * May trigger mastery downgrade if dependency ratio increases.
  */
 export function recordAudioPlay(progress: WordProgress): WordProgress {
   const updated = {
@@ -133,13 +139,7 @@ export function recordNoImageSuccess(progress: WordProgress): WordProgress {
     lastNoImageSuccessAt: Date.now(),
   };
   
-  return updateMasteryState(updated)Record that audio was played for this word.
- */
-export function recordAudioPlay(progress: WordProgress): WordProgress {
-  return {
-    ...progress,
-    audioPlayCount: progress.audioPlayCount + 1,
-  };
+  return updateMasteryState(updated);
 }
 
 /**
@@ -179,7 +179,29 @@ export function getImageOpacity(exposureCount: number): number {
     return 0.3;
   } else {
     // Hide completely
-    alculate audio dependency ratio.
+    return 0;
+  }
+}
+
+/**
+ * Check if image should be shown at all (for intermittent phase).
+ * Returns true if image should be visible this time.
+ */
+export function shouldShowImage(exposureCount: number): boolean {
+  if (exposureCount < IMAGE_FADE_THRESHOLDS.INTERMITTENT) {
+    // Always show during fade phase
+    return true;
+  } else if (exposureCount < IMAGE_FADE_THRESHOLDS.HIDE) {
+    // Show 50% of the time during intermittent phase
+    return Math.random() < 0.5;
+  } else {
+    // Never show when fully mastered
+    return false;
+  }
+}
+
+/**
+ * Calculate audio dependency ratio.
  */
 export function getAudioDependencyRatio(progress: WordProgress): number {
   if (progress.exposureCount === 0) return 0;
@@ -314,28 +336,6 @@ export function getImageOpacity(progress: WordProgress): number {
     default:
       return 1.0;
   }
-/**
- * Check if image should be shown at all (for intermittent phase).
- * Returns true if image should be visible this time.
- */
-export function shouldShowImage(exposureCount: number): boolean {
-  if (exposureCount < IMAGE_FADE_THRESHOLDS.INTERMITTENT) {
-    // Always show during fade phase
-    return true;
-  } else if (exposureCount < IMAGE_FADE_THRESHOLDS.HIDE) {
-    // Show 50% of the time during intermittent phase
-    return Math.random() < 0.5;
-  } else {
-    // Never show when fully mastered
-    return false;
-  }
-}
-
-/**
- * Check if a word is considered mastered (enough exposures).
- */
-export function isMastered(progress: WordProgress): boolean {
-  return progress.exposureCount >= IMAGE_FADE_THRESHOLDS.HIDE;
 }
 
 /**

@@ -134,15 +134,6 @@ export function LessonScreen({
   }, [hasPlayedAudio, imageVisible]);
   
   const handleScreenTap = useCallback(async () => {
-        console.log('Auto-advancing to next word');
-        onAdvanceRef.current();
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [hasPlayedAudio]);
-  
-  const handleScreenTap = useCallback(async () => {
     if (!currentWord) return;
     
     console.log('Screen tapped - speaking word:', currentWord.text);
@@ -164,8 +155,10 @@ export function LessonScreen({
   }, [currentWord, onAudioPlayed, settings]);
   
   // No word available - session ended
-  if (!currentWord) {based on mastery state
-  const imageOpacity = currentWordProgress ? getImageOpacity(currentWordProgress) : 1.0
+  if (!currentWord) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Pressable 
           style={styles.fullScreen}
           onPress={() => navigation.goBack()}
         >
@@ -178,10 +171,8 @@ export function LessonScreen({
     );
   }
   
-  // Calculate image opacity and visibility based on exposure count
-  const exposureCount = currentWordProgress?.exposureCount ?? 0;
-  const imageOpacity = getImageOpacity(exposureCount);
-  const showImage = shouldShowImage(exposureCount);
+  // Calculate image opacity based on mastery state
+  const imageOpacity = currentWordProgress ? getImageOpacity(currentWordProgress) : 1.0;
   
   return (
     <SafeAreaView style={styles.container}>

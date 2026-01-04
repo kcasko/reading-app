@@ -15,6 +15,7 @@ import {
   initializeFromProgress,
   markExposure,
   markAudioPlayed,
+  markNoImageSuccess,
   getMasteryStats,
   getNextWord,
   introduceWord,
