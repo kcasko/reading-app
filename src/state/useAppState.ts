@@ -254,17 +254,24 @@ export function useAppState(): AppState & AppActions {
     
     // Preload next 5 word images for smooth transitions
     if (word) {
-      // Get upcoming words to predict what images we'll need
+      // Get upcoming words to predict what images we'll need (and introduce them)
       const upcomingWords: Word[] = [];
       const tempUsedWords: string[] = [];
       
       for (let i = 0; i < 5; i++) {
         const nextWord = getNextWord(state, tempUsedWords, selectedCategories);
         if (nextWord) {
+          // If future word needs introduction, introduce it
+          if (!state.introducedWordIds.includes(nextWord.id)) {
+            state = introduceWord(state, nextWord.id);
+          }
           upcomingWords.push(nextWord);
           tempUsedWords.push(nextWord.id);
         }
       }
+      
+      // Update state with all introduced words
+      setEngineState(state);
       
       // Get image paths to preload
       const imagePaths = getImagePathsToPreload(word, upcomingWords, 5);
@@ -367,30 +374,38 @@ export function useAppState(): AppState & AppActions {
     }
     
     console.log('Getting next word...');
-    let nextWord = getNextWord(engineState, [], selectedCategories);
+    let currentState = engineState;
+    let nextWord = getNextWord(currentState, [], selectedCategories);
     console.log('Next word:', nextWord?.text);
     
     // If word is not yet introduced, introduce it now
-    if (nextWord && !engineState.introducedWordIds.includes(nextWord.id)) {
-      const newState = introduceWord(engineState, nextWord.id);
-      setEngineState(newState);
+    if (nextWord && !currentState.introducedWordIds.includes(nextWord.id)) {
+      currentState = introduceWord(currentState, nextWord.id);
+      setEngineState(currentState);
     }
     
     setCurrentWord(nextWord);
     
     // Preload next 5 word images for smooth transitions
     if (nextWord) {
-      // Get upcoming words to predict what images we'll need
+      // Get upcoming words to predict what images we'll need (use updated state)
       const upcomingWords: Word[] = [];
       const tempUsedWords: string[] = [];
       
       for (let i = 0; i < 5; i++) {
-        const futureWord = getNextWord(engineState, tempUsedWords, selectedCategories);
+        const futureWord = getNextWord(currentState, tempUsedWords, selectedCategories);
         if (futureWord) {
+          // If future word needs introduction, introduce it
+          if (!currentState.introducedWordIds.includes(futureWord.id)) {
+            currentState = introduceWord(currentState, futureWord.id);
+          }
           upcomingWords.push(futureWord);
           tempUsedWords.push(futureWord.id);
         }
       }
+      
+      // Update state with all introduced words
+      setEngineState(currentState);
       
       // Get image paths to preload
       const imagePaths = getImagePathsToPreload(nextWord, upcomingWords, 5);

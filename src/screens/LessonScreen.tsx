@@ -58,8 +58,16 @@ export function LessonScreen({
   onClearMastery,
 }: LessonScreenComponentProps) {
   const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
-  const [isFirstAppearance, setIsFirstAppearance] = useState(true);
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const onAdvanceRef = useRef(onAdvance);
+  const onWordExposedRef = useRef(onWordExposed);
+  const currentWordIdRef = useRef<string | null>(null);
+  
+  // Keep refs up to date
+  useEffect(() => {
+    onAdvanceRef.current = onAdvance;
+    onWordExposedRef.current = onWordExposed;
+  }, [onAdvance, onWordExposed]);
   
   // Navigate to mastery screen when word is mastered
   useEffect(() => {
@@ -72,47 +80,42 @@ export function LessonScreen({
     }
   }, [newlyMasteredWord, navigation, onClearMastery]);
   
-  // Mark word as exposed when it appears
+  // Mark word as exposed when it appears (and reset state)
   useEffect(() => {
-    if (currentWord) {
+    if (currentWord && currentWord.id !== currentWordIdRef.current) {
       console.log('New word appeared:', currentWord.id);
+      currentWordIdRef.current = currentWord.id;
       setHasPlayedAudio(false);
-      setIsFirstAppearance(true);
-      onWordExposed();
+      
+      // Clear any pending auto-advance timer
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+      
+      onWordExposedRef.current();
     }
   }, [currentWord?.id]);
   
   // Auto-advance after audio plays (gentle delay)
   useEffect(() => {
-    console.log('Auto-advance check:', { hasPlayedAudio, isFirstAppearance });
+    console.log('Auto-advance check - hasPlayedAudio:', hasPlayedAudio);
     
-    // Clear any existing timer
-    if (autoAdvanceTimerRef.current) {
-      clearTimeout(autoAdvanceTimerRef.current);
-      autoAdvanceTimerRef.current = null;
-    }
-    
-    if (hasPlayedAudio && !isFirstAppearance) {
+    if (hasPlayedAudio) {
       console.log('Setting timer to advance in 2 seconds...');
-      autoAdvanceTimerRef.current = setTimeout(() => {
+      const timer = setTimeout(() => {
         console.log('Auto-advancing to next word');
-        onAdvance();
-      }, 2000); // 2 second pause after audio before advancing
+        onAdvanceRef.current();
+      }, 2000);
+      
+      return () => clearTimeout(timer);
     }
-    
-    return () => {
-      if (autoAdvanceTimerRef.current) {
-        clearTimeout(autoAdvanceTimerRef.current);
-        autoAdvanceTimerRef.current = null;
-      }
-    };
-  }, [hasPlayedAudio, isFirstAppearance]); // Removed onAdvance from dependencies
+  }, [hasPlayedAudio]);
   
   const handleScreenTap = useCallback(async () => {
     if (!currentWord) return;
     
     console.log('Screen tapped - speaking word:', currentWord.text);
-    console.log('Before tap - hasPlayedAudio:', hasPlayedAudio, 'isFirstAppearance:', isFirstAppearance);
     
     // Play audio with voice settings
     try {
@@ -124,13 +127,11 @@ export function LessonScreen({
       console.log('Audio finished playing, updating state...');
       onAudioPlayed();
       setHasPlayedAudio(true);
-      setIsFirstAppearance(false);
       
-      console.log('State updated - hasPlayedAudio: true, isFirstAppearance: false');
     } catch (error) {
       console.error('Failed to speak word:', error);
     }
-  }, [currentWord, hasPlayedAudio, isFirstAppearance, onAudioPlayed, settings]);
+  }, [currentWord, onAudioPlayed, settings]);
   
   // No word available - session ended
   if (!currentWord) {
@@ -188,13 +189,6 @@ export function LessonScreen({
               fontFamily={settings.fontFamily}
             />
           </View>
-          
-          {/* Hidden visual hint (fades in only if child doesn't tap) */}
-          {isFirstAppearance && (
-            <View style={styles.hintContainer}>
-              <Text style={styles.hintText}>👆</Text>
-            </View>
-          )}
         </View>
       </Pressable>
     </SafeAreaView>
