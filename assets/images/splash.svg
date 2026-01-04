@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1242" height="2436" viewBox="0 0 1242 2436" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Splash screen background -->
+  <rect width="1242" height="2436" fill="#F5F0E8"/>
+  
+  <!-- Main content area -->
+  <g transform="translate(121, 500)">
+    <!-- App logo/icon (centered) -->
+    <rect x="350" y="200" width="200" height="150" rx="20" fill="#7A6B9A"/>
+    <rect x="350" y="200" width="100" height="150" rx="20" fill="white"/>
+    <rect x="450" y="200" width="100" height="150" rx="20" fill="#F5F0E8"/>
+    
+    <!-- Large letter A for sight words -->
+    <path d="M450 250 L500 350 L475 350 L470 340 L430 340 L425 350 L400 350 L450 250 Z M440 320 L460 320 L450 300 Z" fill="#7A6B9A"/>
+    
+    <!-- App name -->
+    <text x="500" y="420" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="bold" fill="#7A6B9A" text-anchor="middle">Sight Words</text>
+    
+    <!-- Subtitle -->
+    <text x="500" y="470" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#8B7B8B" text-anchor="middle">Learn to Read with Confidence</text>
+    
+    <!-- Decorative elements -->
+    <circle cx="300" cy="600" r="8" fill="#D48A5D" opacity="0.6"/>
+    <circle cx="700" cy="580" r="6" fill="#7A6B9A" opacity="0.4"/>
+    <circle cx="350" cy="650" r="5" fill="#F9D71C" opacity="0.7"/>
+    <circle cx="650" cy="630" r="7" fill="#D48A5D" opacity="0.5"/>
+    
+    <!-- Loading indicator area -->
+    <rect x="400" y="800" width="200" height="4" rx="2" fill="#E5E5E5"/>
+    <rect x="400" y="800" width="80" height="4" rx="2" fill="#7A6B9A">
+      <animate attributeName="width" values="0;200;0" dur="2s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <!-- Bottom decoration -->
+  <g transform="translate(0, 2200)">
+    <circle cx="100" cy="100" r="20" fill="#7A6B9A" opacity="0.1"/>
+    <circle cx="1142" cy="120" r="15" fill="#D48A5D" opacity="0.1"/>
+    <circle cx="200" cy="150" r="12" fill="#F9D71C" opacity="0.1"/>
+    <circle cx="1000" cy="80" r="18" fill="#7A6B9A" opacity="0.1"/>
+  </g>
+</svg>

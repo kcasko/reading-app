@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main app icon with book and letter theme -->
+  <rect width="1024" height="1024" rx="180" fill="#7A6B9A"/>
+  
+  <!-- Book shape -->
+  <rect x="212" y="212" width="600" height="450" rx="40" fill="white"/>
+  <rect x="212" y="212" width="300" height="450" rx="40" fill="#F5F0E8"/>
+  
+  <!-- Bookmark -->
+  <rect x="480" y="162" width="64" height="120" fill="#D48A5D"/>
+  <polygon points="512,252 496,232 528,232" fill="#D48A5D"/>
+  
+  <!-- Letter "A" in the center -->
+  <path d="M400 350 L440 350 L450 380 L390 380 Z M420 320 L460 420 L380 420 Z" fill="#7A6B9A" stroke="#7A6B9A" stroke-width="8"/>
+  <path d="M420 320 L500 500 L460 500 L450 470 L390 470 L380 500 L340 500 Z M405 440 L435 440 L420 400 Z" fill="#7A6B9A"/>
+  
+  <!-- Simple page lines -->
+  <line x1="550" y1="320" x2="750" y2="320" stroke="#E5E5E5" stroke-width="4"/>
+  <line x1="550" y1="360" x2="720" y2="360" stroke="#E5E5E5" stroke-width="4"/>
+  <line x1="550" y1="400" x2="740" y2="400" stroke="#E5E5E5" stroke-width="4"/>
+  <line x1="550" y1="440" x2="710" y2="440" stroke="#E5E5E5" stroke-width="4"/>
+  
+  <!-- Decorative stars for learning -->
+  <circle cx="300" cy="750" r="16" fill="#F9D71C"/>
+  <circle cx="350" cy="780" r="12" fill="#F9D71C"/>
+  <circle cx="650" cy="750" r="14" fill="#F9D71C"/>
+  <circle cx="700" cy="780" r="10" fill="#F9D71C"/>
+</svg>

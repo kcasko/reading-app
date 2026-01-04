@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="432" height="432" viewBox="0 0 432 432" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Android adaptive icon foreground (should fit within safe area) -->
+  
+  <!-- Safe area is roughly 108dp margin from edges -->
+  <g transform="translate(108, 108)">
+    <!-- Book icon with letter -->
+    <rect x="32" y="48" width="152" height="120" rx="16" fill="white"/>
+    <rect x="32" y="48" width="76" height="120" rx="16" fill="#F5F0E8"/>
+    
+    <!-- Bookmark -->
+    <rect x="104" y="32" width="16" height="32" fill="#D48A5D"/>
+    <polygon points="112,56 108,48 116,48" fill="#D48A5D"/>
+    
+    <!-- Letter "A" in center -->
+    <path d="M88 80 L104 120 L96 120 L94 114 L82 114 L80 120 L72 120 L88 80 Z M85 106 L91 106 L88 94 Z" fill="#7A6B9A"/>
+    
+    <!-- Simple page lines on right side -->
+    <line x1="120" y1="80" x2="168" y2="80" stroke="#E5E5E5" stroke-width="2"/>
+    <line x1="120" y1="94" x2="160" y2="94" stroke="#E5E5E5" stroke-width="2"/>
+    <line x1="120" y1="108" x2="165" y2="108" stroke="#E5E5E5" stroke-width="2"/>
+    <line x1="120" y1="122" x2="158" y2="122" stroke="#E5E5E5" stroke-width="2"/>
+    
+    <!-- Small decorative stars -->
+    <circle cx="64" cy="180" r="4" fill="#F9D71C"/>
+    <circle cx="140" cy="185" r="3" fill="#F9D71C"/>
+  </g>
+</svg>
