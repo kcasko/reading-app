@@ -162,55 +162,20 @@ export function WordCard({
  * Returns null if image doesn't exist (will fall back to emoji).
  */
 function getImageSource(imagePath: string): number | null {
-  // Map image paths to require() statements
-  // This allows images to be bundled with the app
+  // Images not yet added - using emoji placeholders
+  // Uncomment when images are added to assets/images/
+  /*
   const imageMap: Record<string, any> = {
     // Animals
     'animals/cat.png': require('../../assets/images/animals/cat.png'),
     'animals/dog.png': require('../../assets/images/animals/dog.png'),
-    'animals/bird.png': require('../../assets/images/animals/bird.png'),
-    'animals/fish.png': require('../../assets/images/animals/fish.png'),
-    'animals/cow.png': require('../../assets/images/animals/cow.png'),
-    'animals/pig.png': require('../../assets/images/animals/pig.png'),
-    'animals/horse.png': require('../../assets/images/animals/horse.png'),
-    'animals/duck.png': require('../../assets/images/animals/duck.png'),
-    
-    // Food
-    'food/apple.png': require('../../assets/images/food/apple.png'),
-    'food/banana.png': require('../../assets/images/food/banana.png'),
-    'food/bread.png': require('../../assets/images/food/bread.png'),
-    'food/milk.png': require('../../assets/images/food/milk.png'),
-    'food/egg.png': require('../../assets/images/food/egg.png'),
-    'food/cake.png': require('../../assets/images/food/cake.png'),
-    'food/pizza.png': require('../../assets/images/food/pizza.png'),
-    'food/cookie.png': require('../../assets/images/food/cookie.png'),
-    
-    // Objects
-    'objects/ball.png': require('../../assets/images/objects/ball.png'),
-    'objects/book.png': require('../../assets/images/objects/book.png'),
-    'objects/cup.png': require('../../assets/images/objects/cup.png'),
-    'objects/chair.png': require('../../assets/images/objects/chair.png'),
-    'objects/door.png': require('../../assets/images/objects/door.png'),
-    'objects/bed.png': require('../../assets/images/objects/bed.png'),
-    'objects/table.png': require('../../assets/images/objects/table.png'),
-    'objects/hat.png': require('../../assets/images/objects/hat.png'),
-    
-    // Vehicles
-    'vehicles/car.png': require('../../assets/images/vehicles/car.png'),
-    'vehicles/bus.png': require('../../assets/images/vehicles/bus.png'),
-    'vehicles/truck.png': require('../../assets/images/vehicles/truck.png'),
-    'vehicles/train.png': require('../../assets/images/vehicles/train.png'),
-    'vehicles/boat.png': require('../../assets/images/vehicles/boat.png'),
-    'vehicles/plane.png': require('../../assets/images/vehicles/plane.png'),
-    'vehicles/bike.png': require('../../assets/images/vehicles/bike.png'),
-    'vehicles/ship.png': require('../../assets/images/vehicles/ship.png'),
+    // ... etc
   };
   
-  try {
-    return imageMap[imagePath] || null;
-  } catch {
-    return null;
-  }
+  return imageMap[imagePath] || null;
+  */
+  
+  return null; // Always use emoji for now
 }
 
 const styles = StyleSheet.create({

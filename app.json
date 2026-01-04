@@ -8,6 +8,7 @@
     "scheme": "sightwords",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "main": "index.ts",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
