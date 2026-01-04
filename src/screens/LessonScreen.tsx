@@ -109,8 +109,17 @@ export function LessonScreen({
       
       onWordExposedRef.current();
     }
-  }, [currentWord?.id, currentWordProgress
-      
+  }, [currentWord?.id, currentWordProgress]);
+  
+  // Auto-advance after audio plays (gentle delay)
+  useEffect(() => {
+    console.log('Auto-advance check - hasPlayedAudio:', hasPlayedAudio);
+    
+    if (hasPlayedAudio) {
+      console.log('Setting timer to advance in 2 seconds...');
+      const timer = setTimeout(() => {
+        console.log('Auto-advancing to next word');
+        
         // If image wasn't visible and child didn't tap audio, count as no-image success
         if (!imageVisible) {
           console.log('No-image success - word recognized without picture!');
@@ -122,13 +131,9 @@ export function LessonScreen({
       
       return () => clearTimeout(timer);
     }
-  }, [hasPlayedAudio, imageVisibleter audio plays (gentle delay)
-  useEffect(() => {
-    console.log('Auto-advance check - hasPlayedAudio:', hasPlayedAudio);
-    
-    if (hasPlayedAudio) {
-      console.log('Setting timer to advance in 2 seconds...');
-      const timer = setTimeout(() => {
+  }, [hasPlayedAudio, imageVisible]);
+  
+  const handleScreenTap = useCallback(async () => {
         console.log('Auto-advancing to next word');
         onAdvanceRef.current();
       }, 2000);
