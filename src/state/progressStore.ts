@@ -72,6 +72,7 @@ export async function saveProgress(
 
 /**
  * Load word progress from storage.
+ * Migrates old progress format to new format with masteryState fields.
  */
 export async function loadProgress(
   storageKey: string = STORAGE_KEYS.WORD_PROGRESS
@@ -79,7 +80,40 @@ export async function loadProgress(
   const progress = await loadFromStorage<Record<string, WordProgress>>(
     storageKey
   );
-  return progress ?? {};
+  
+  if (!progress) {
+    return {};
+  }
+  
+  // Migrate old progress data to new format
+  const migratedProgress: Record<string, WordProgress> = {};
+  
+  for (const [wordId, wordProgress] of Object.entries(progress)) {
+    migratedProgress[wordId] = {
+      ...wordProgress,
+      // Add new fields if they don't exist
+      noImageSuccessCount: wordProgress.noImageSuccessCount ?? 0,
+      lastNoImageSuccessAt: wordProgress.lastNoImageSuccessAt ?? 0,
+      masteryState: wordProgress.masteryState ?? determineMasteryStateFromExposure(wordProgress),
+    };
+  }
+  
+  return migratedProgress;
+}
+
+/**
+ * Determine initial mastery state based on exposure count (for migration).
+ */
+function determineMasteryStateFromExposure(progress: WordProgress): string {
+  const exposureCount = progress.exposureCount ?? 0;
+  
+  if (exposureCount >= 12) {
+    return 'reinforcing'; // Give them a chance to prove mastery
+  } else if (exposureCount >= 8) {
+    return 'practicing';
+  } else {
+    return 'learning';
+  }
 }
 
 /**

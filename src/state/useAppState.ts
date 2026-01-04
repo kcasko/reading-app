@@ -89,6 +89,7 @@ export interface AppActions {
   startReplaySession: () => void;
   onWordExposed: () => void;
   onAudioPlayed: () => void;
+  onNoImageSuccess: () => void;
   advanceToNextWord: () => void;
   endLesson: () => void;
   
@@ -100,6 +101,9 @@ export interface AppActions {
   
   // Mastery actions
   clearMasteryNotification: () => void;
+  
+  // Profile actions
+  reloadProfile: () => Promise<void>;
   
   // Reset
   resetAllProgress: () => Promise<void>;
@@ -354,6 +358,17 @@ export function useAppState(): AppState & AppActions {
   }, [currentWord, engineState]);
   
   /**
+   * Record successful no-image recognition (word shown without image, audio not tapped).
+   */
+  const onNoImageSuccess = useCallback(() => {
+    if (!currentWord) return;
+    
+    console.log('No-image success recorded for:', currentWord.id);
+    const newState = markNoImageSuccess(engineState, currentWord.id);
+    setEngineState(newState);
+  }, [currentWord, engineState]);
+  
+  /**
    * Advance to next word in session.
    */
   const advanceToNextWord = useCallback(() => {
@@ -531,6 +546,82 @@ export function useAppState(): AppState & AppActions {
     setNewlyMasteredWord(null);
   }, []);
   
+  /**
+   * Reload profile data (called when returning to Home after profile switch).
+   * Does not show loading screen to prevent flicker.
+   */
+  const reloadProfile = useCallback(async () => {
+    try {
+      // Load active profile from storage
+      const profile = await getActiveProfile();
+      if (!profile) {
+        // No active profile - navigate to selector
+        return;
+      }
+      
+      // Only reload if profile changed
+      if (profile.id === activeProfile?.id) {
+        return;
+      }
+      
+      setActiveProfile(profile);
+      const storageKeys = getProfileStorageKeys(profile.id);
+      
+      // Load saved progress for this profile
+      const savedProgress = await loadProgress(storageKeys.progress);
+      let initialState: WordEngineState;
+      
+      if (Object.keys(savedProgress).length > 0) {
+        initialState = initializeFromProgress(savedProgress);
+      } else {
+        // First launch for this profile - introduce first 5 words
+        initialState = createInitialState();
+        const firstWords = ALL_WORDS.slice(0, 5).map(w => w.id);
+        initialState = introduceWords(initialState, firstWords);
+      }
+      
+      setEngineState(initialState);
+      
+      // Load saved settings for this profile
+      const savedSettings = await loadSettings(storageKeys.settings);
+      setSettings(savedSettings);
+      
+      // Load selected categories for this profile
+      const categoriesJson = await AsyncStorage.getItem(storageKeys.categories);
+      if (categoriesJson) {
+        const categories = JSON.parse(categoriesJson) as WordCategory[];
+        setSelectedCategories(categories);
+      } else {
+        setSelectedCategories(['animals', 'food', 'objects', 'vehicles']);
+      }
+      
+      // Load last session words for this profile
+      const lastSessionJson = await AsyncStorage.getItem(storageKeys.lastSession);
+      if (lastSessionJson) {
+        const words = JSON.parse(lastSessionJson) as string[];
+        setLastSessionWords(words);
+      } else {
+        setLastSessionWords([]);
+      }
+      
+      // Load celebrated words for this profile
+      const celebratedJson = await AsyncStorage.getItem(storageKeys.celebrated);
+      if (celebratedJson) {
+        const words = JSON.parse(celebratedJson) as string[];
+        setCelebratedWords(new Set(words));
+      } else {
+        setCelebratedWords(new Set());
+      }
+      
+      // Load streak data for this profile
+      const savedStreakData = await loadStreakData(storageKeys.streak);
+      setStreakData(savedStreakData);
+      
+    } catch (error) {
+      console.error('Failed to reload profile:', error);
+    }
+  }, [activeProfile]);
+  
   // Computed values
   const stats = getMasteryStats(engineState);
   const currentWordProgress = currentWord 
@@ -559,11 +650,13 @@ export function useAppState(): AppState & AppActions {
     startReplaySession,
     onWordExposed,
     onAudioPlayed,
+    onNoImageSuccess,
     advanceToNextWord,
     endLesson,
     updateSettings,
     toggleCategory,
     clearMasteryNotification,
+    reloadProfile,
     resetAllProgress,
   };
 }

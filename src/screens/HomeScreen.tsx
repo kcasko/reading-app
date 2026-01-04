@@ -8,7 +8,7 @@
  * - Calm, simple, predictable
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import {
   ScrollView,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
@@ -43,6 +44,7 @@ interface HomeScreenComponentProps extends HomeScreenProps {
   onStartLesson: () => void;
   onStartReplaySession: () => void;
   onToggleCategory: (category: WordCategory) => void;
+  onReloadProfile: () => Promise<void>;
 }
 
 const CATEGORY_CONFIG: Record<WordCategory, { emoji: string; label: string; color: string }> = {
@@ -62,9 +64,18 @@ export function HomeScreen({
   onStartLesson,
   onStartReplaySession,
   onToggleCategory,
+  onReloadProfile,
 }: HomeScreenComponentProps) {
   const [parentModeVisible, setParentModeVisible] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  
+  // Reload profile data when returning from ProfileSelector
+  useFocusEffect(
+    React.useCallback(() => {
+      // Always reload to catch profile switches/deletions
+      onReloadProfile();
+    }, [onReloadProfile])
+  );
   
   const handleStartLesson = () => {
     if (selectedCategories.length === 0) return; // Prevent starting with no categories
@@ -117,19 +128,25 @@ export function HomeScreen({
   
   return (
     <SafeAreaView style={styles.container}>
+      {/* Profile Badge - shows active profile, positioned absolutely over everything */}
+      {activeProfile && (
+        <Pressable 
+          style={styles.profileBadge}
+          onPress={handleSwitchProfile}
+          accessibilityLabel={`Switch from ${activeProfile.name}`}
+          accessibilityRole="button"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Text style={styles.profileAvatar}>{activeProfile.avatar}</Text>
+          <Text style={styles.profileName}>{activeProfile.name}</Text>
+        </Pressable>
+      )}
+      
       <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Badge - shows active profile */}
-        {activeProfile && (
-          <View style={styles.profileBadge}>
-            <Text style={styles.profileAvatar}>{activeProfile.avatar}</Text>
-            <Text style={styles.profileName}>{activeProfile.name}</Text>
-          </View>
-        )}
-        
         {/* Title - long press to reveal parent mode */}
         <Pressable
           onPressIn={handleTitlePressIn}
@@ -219,21 +236,18 @@ export function HomeScreen({
               <Text style={styles.replayButtonIcon}>🔄</Text>
             </Pressable>
           )}
-        </View>
-        
-        {/* Simple progress indicator - non-distracting */}
-        <View style={styles.progressContainer}>
-          {[...Array(10)].map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.star,
-                i < Math.floor(stats.mastered / 3) && styles.starFilled
-              ]}
-            >
-              <Text style={styles.starText}>⭐</Text>
+          
+          {/* Progress Stars - Shows mastered words */}
+          {stats.mastered > 0 && (
+            <View style={styles.starsContainer}>
+              <Text style={styles.starsText}>
+                {'⭐'.repeat(Math.min(stats.mastered, 10))}
+              </Text>
+              <Text style={styles.starsLabel}>
+                {stats.mastered} word{stats.mastered !== 1 ? 's' : ''} mastered!
+              </Text>
             </View>
-          ))}
+          )}
         </View>
         
         {/* Parent mode - only visible after long press */}
@@ -273,22 +287,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: spacing.screenHorizontal,
-    paddingVertical: spacing.screenVertical,
-    paddingBottom: spacing.xl * 2,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
   },
   profileBadge: {
     position: 'absolute',
-    top: spacing.md,
+    top: spacing.xl,
     right: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    borderRadius: 24,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderWidth: 2,
     borderColor: colors.primaryLight,
+    zIndex: 1000,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   profileAvatar: {
     fontSize: 24,
@@ -302,28 +322,29 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     alignItems: 'center',
-    paddingVertical: spacing.xl,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
   appIcon: {
-    fontSize: 64,
-    marginBottom: spacing.md,
+    fontSize: 40,
+    marginBottom: spacing.xs,
   },
   title: {
     ...typography.heading,
-    fontSize: 42,
+    fontSize: 32,
     color: colors.textPrimary,
   },
   categoryContainer: {
-    marginVertical: spacing.lg,
+    marginVertical: spacing.sm,
     zIndex: 10,
   },
   categoryPrompt: {
     ...typography.body,
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: '600',
     color: colors.textPrimary,
     textAlign: 'center',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.sm,
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -332,12 +353,12 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   categoryButton: {
-    width: 140,
-    height: 140,
-    borderRadius: 20,
+    width: 90,
+    height: 90,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 4,
+    borderWidth: 3,
     borderColor: 'transparent',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -347,17 +368,17 @@ const styles = StyleSheet.create({
   },
   categoryButtonSelected: {
     borderColor: colors.primary,
-    borderWidth: 5,
+    borderWidth: 4,
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 6,
   },
   categoryEmoji: {
-    fontSize: 56,
-    marginBottom: spacing.xs,
+    fontSize: 36,
+    marginBottom: 2,
   },
   categoryLabel: {
-    fontSize: 18,
+    fontSize: 13,
     fontWeight: '600',
     color: colors.textPrimary,
   },
@@ -371,13 +392,13 @@ const styles = StyleSheet.create({
   },
   mainButtonContainer: {
     alignItems: 'center',
-    marginTop: spacing.lg,
-    marginBottom: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
   },
   startButton: {
-    width: 280,
-    height: 280,
-    borderRadius: 140,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -392,24 +413,24 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   startButtonText: {
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
   },
   startButtonIcon: {
-    fontSize: 64,
+    fontSize: 48,
     color: '#FFFFFF',
   },
   reviewButton: {
-    marginTop: spacing.lg,
+    marginTop: spacing.sm,
     backgroundColor: colors.primaryLight,
-    borderRadius: 20,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
+    borderRadius: 16,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
     borderWidth: 2,
     borderColor: colors.primary,
     shadowColor: '#000',
@@ -419,22 +440,22 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   reviewButtonText: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: '600',
     color: colors.primary,
   },
   reviewButtonIcon: {
-    fontSize: 28,
+    fontSize: 20,
   },
   replayButton: {
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
     backgroundColor: colors.surfaceElevated,
-    borderRadius: 16,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
+    borderRadius: 12,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
     borderWidth: 2,
     borderColor: colors.border,
     shadowColor: '#000',
@@ -444,19 +465,19 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   replayButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     color: colors.textSecondary,
   },
   replayButtonIcon: {
-    fontSize: 20,
+    fontSize: 16,
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
+    gap: spacing.xs,
+    paddingVertical: spacing.sm,
   },
   star: {
     opacity: 0.2,
@@ -465,18 +486,18 @@ const styles = StyleSheet.create({
     opacity: 1.0,
   },
   starText: {
-    fontSize: 28,
+    fontSize: 20,
   },
   streakContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primaryLight,
-    borderRadius: 20,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    marginTop: spacing.md,
-    marginHorizontal: spacing.screenHorizontal,
+    borderRadius: 16,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    marginTop: spacing.xs,
+    marginHorizontal: spacing.md,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -484,14 +505,29 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   streakEmoji: {
-    fontSize: 24,
-    marginRight: spacing.sm,
+    fontSize: 18,
+    marginRight: spacing.xs,
   },
   streakText: {
     ...typography.body,
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '600',
     color: colors.primary,
+  },
+  starsContainer: {
+    alignItems: 'center',
+    marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+  },
+  starsText: {
+    fontSize: 24,
+    marginBottom: spacing.xs,
+  },
+  starsLabel: {
+    ...typography.body,
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontWeight: '600',
   },
   parentMode: {
     position: 'absolute',

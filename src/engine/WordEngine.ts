@@ -130,6 +130,27 @@ export function markAudioPlayed(
 }
 
 /**
+ * Record successful no-image recognition (word shown without image, child didn't tap audio).
+ */
+export function markNoImageSuccess(
+  state: WordEngineState,
+  wordId: string
+): WordEngineState {
+  const progress = state.progress[wordId];
+  if (!progress) {
+    return state;
+  }
+  
+  return {
+    ...state,
+    progress: {
+      ...state.progress,
+      [wordId]: recordNoImageSuccess(progress),
+    },
+  };
+}
+
+/**
  * Get the next word to study, prioritized by spaced repetition.
  * Returns null if no words are available.
  * Optionally filters by selected categories.

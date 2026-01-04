@@ -38,6 +38,7 @@ interface LessonScreenComponentProps extends LessonScreenProps {
   currentWordProgress: WordProgress | null;
   onWordExposed: () => void; // Called when word is shown
   onAudioPlayed: () => void; // Called when audio is played
+  onNoImageSuccess: () => void; // Called when word recognized without image/audio
   onAdvance: () => void; // Called to move to next word
   wordsInSession: number;
   settings: AppSettings; // For audio settings like voice type
@@ -51,6 +52,7 @@ export function LessonScreen({
   currentWordProgress,
   onWordExposed,
   onAudioPlayed,
+  onNoImageSuccess,
   onAdvance,
   wordsInSession,
   settings,
@@ -58,16 +60,19 @@ export function LessonScreen({
   onClearMastery,
 }: LessonScreenComponentProps) {
   const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
+  const [imageVisible, setImageVisible] = useState(true);
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const onAdvanceRef = useRef(onAdvance);
   const onWordExposedRef = useRef(onWordExposed);
+  const onNoImageSuccessRef = useRef(onNoImageSuccess);
   const currentWordIdRef = useRef<string | null>(null);
   
   // Keep refs up to date
   useEffect(() => {
     onAdvanceRef.current = onAdvance;
     onWordExposedRef.current = onWordExposed;
-  }, [onAdvance, onWordExposed]);
+    onNoImageSuccessRef.current = onNoImageSuccess;
+  }, [onAdvance, onWordExposed, onNoImageSuccess]);
   
   // Navigate to mastery screen when word is mastered
   useEffect(() => {
@@ -83,9 +88,14 @@ export function LessonScreen({
   // Mark word as exposed when it appears (and reset state)
   useEffect(() => {
     if (currentWord && currentWord.id !== currentWordIdRef.current) {
-      console.log('New word appeared:', currentWord.id);
-      currentWordIdRef.current = currentWord.id;
-      setHasPlayedAudio(false);
+      conDetermine if image should be shown based on progress
+      if (currentWordProgress) {
+        const showImage = shouldShowImage(currentWordProgress);
+        setImageVisible(showImage);
+        console.log('Image visible:', showImage, 'State:', currentWordProgress.masteryState);
+      } else {
+        setImageVisible(true); // Default to showing image
+      }
       
       // Clear any pending auto-advance timer
       if (autoAdvanceTimerRef.current) {
@@ -95,9 +105,20 @@ export function LessonScreen({
       
       onWordExposedRef.current();
     }
-  }, [currentWord?.id]);
-  
-  // Auto-advance after audio plays (gentle delay)
+  }, [currentWord?.id, currentWordProgress
+      
+        // If image wasn't visible and child didn't tap audio, count as no-image success
+        if (!imageVisible) {
+          console.log('No-image success - word recognized without picture!');
+          onNoImageSuccessRef.current();
+        }
+        
+        onAdvanceRef.current();
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [hasPlayedAudio, imageVisibleter audio plays (gentle delay)
   useEffect(() => {
     console.log('Auto-advance check - hasPlayedAudio:', hasPlayedAudio);
     
@@ -134,10 +155,8 @@ export function LessonScreen({
   }, [currentWord, onAudioPlayed, settings]);
   
   // No word available - session ended
-  if (!currentWord) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Pressable 
+  if (!currentWord) {based on mastery state
+  const imageOpacity = currentWordProgress ? getImageOpacity(currentWordProgress) : 1.0
           style={styles.fullScreen}
           onPress={() => navigation.goBack()}
         >
@@ -185,7 +204,7 @@ export function LessonScreen({
               word={currentWord.text}
               imagePath={currentWord.imagePath}
               imageOpacity={imageOpacity}
-              showImage={showImage}
+              showImage={imageVisible}
               fontFamily={settings.fontFamily}
             />
           </View>

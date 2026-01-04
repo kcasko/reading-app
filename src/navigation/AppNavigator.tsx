@@ -86,6 +86,7 @@ export function AppNavigator() {
               onStartLesson={appState.startLesson}
               onStartReplaySession={appState.startReplaySession}
               onToggleCategory={appState.toggleCategory}
+              onReloadProfile={appState.reloadProfile}
               activeProfile={appState.activeProfile}
             />
           )}
@@ -104,6 +105,7 @@ export function AppNavigator() {
               currentWordProgress={appState.currentWordProgress}
               onWordExposed={appState.onWordExposed}
               onAudioPlayed={appState.onAudioPlayed}
+              onNoImageSuccess={appState.onNoImageSuccess}
               onAdvance={appState.advanceToNextWord}
               wordsInSession={appState.wordsInSession}
               settings={appState.settings}
