@@ -88,7 +88,11 @@ export function LessonScreen({
   // Mark word as exposed when it appears (and reset state)
   useEffect(() => {
     if (currentWord && currentWord.id !== currentWordIdRef.current) {
-      conDetermine if image should be shown based on progress
+      console.log('New word appeared:', currentWord.id);
+      currentWordIdRef.current = currentWord.id;
+      setHasPlayedAudio(false);
+      
+      // Determine if image should be shown based on progress
       if (currentWordProgress) {
         const showImage = shouldShowImage(currentWordProgress);
         setImageVisible(showImage);
